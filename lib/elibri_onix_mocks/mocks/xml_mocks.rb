@@ -1,3 +1,5 @@
+# encoding: UTF-8
+
 require 'mocha'
 module Elibri
   class XmlMocks
