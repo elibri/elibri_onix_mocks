@@ -131,14 +131,12 @@ module OnixHelpers
 
 
     def authorship_kind
-      value = self.method_missing(:authorship_kind) || :user_given
-      #ActiveSupport::StringInquirer.new(value.to_s)
+      value = self.method_missing(:authorship_kind) || ActiveSupport::StringInquirer.new(:user_given.to_s)
     end
 
 
    def series_membership_kind
-      value = self.method_missing(:series_membership_kind) || :user_given
-      #ActiveSupport::StringInquirer.new(value.to_s)
+      value = self.method_missing(:series_membership_kind) || ActiveSupport::StringInquirer.new(:user_given.to_s)
     end
 
 
