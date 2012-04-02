@@ -86,7 +86,7 @@ module Elibri
           :audience_age_from => 7,
           :audience_age_to => 25,
           # Trochę oszukujemy, żeby w XML`u pokazać wszystkie 3 opcje:
-          :authorship_kind => stub('authorship_kind', :user_given? => true, :collective? => false, :no_contributor? => false),
+          :authorship_kind => stub('AuthorshipKind', :user_given? => true, :collective? => false, :no_contributor? => false),
           :contributors => [
             stub('Contributor',
               :artificial_id => 257,
@@ -99,7 +99,7 @@ module Elibri
               :last_name_postfix => 'Ibrahim',
               :biography => stub('OtherText', :text => 'Biografia Sienkiewicza', :exportable? => true, :is_a_review? => false, :resource_link => 'http://example').extend(MockMethodMissing),
               :updated_at => Date.new(2011, 11, 04).to_time + 10.hours + 5.minutes + 27.seconds
-            )
+            ).extend(MockMethodMissing)
           ],
           :or_title => "Tytuł oryginalny",
           :trade_title => "Tytuł handlowy",
@@ -126,7 +126,7 @@ module Elibri
           ],
           :series_membership_kind => stub('series_membership_kind', :user_given? => true),
           :series_memberships => [
-            stub('SeriesMembership', :series_name => 'Lektury szkolne', :number_within_series => '2')
+            stub('SeriesMembership', :series_name => 'Lektury szkolne', :number_within_series => '2').extend(MockMethodMissing)
           ],
           :facsimiles => [stub('Product', :publisher_name => 'PWN', :publisher_id => 12, :publisher_symbol => 'Tytuł dodruku', :isbn_value => '9788324705818')],
           :similar_products => [stub('Product', :publisher_name => 'WNT', :publisher_id => 13, :publisher_symbol => 'Tytuł podobnej książki', :isbn_value => '9788324799992')],
@@ -138,7 +138,7 @@ module Elibri
                  :onix_resource_mode => Elibri::ONIX::Dict::Release_3_0::ResourceMode::IMAGE,
                  :file => stub('Paperclip::Attachment', :url => 'http://elibri.com.pl/sciezka/do/pliku.png'),
                  :updated_at => Date.new(2011, 12, 01).to_time + 19.hours + 5.minutes + 28.seconds
-                )
+                ).extend(MockMethodMissing)
           ],
           :product_availabilities => [
             stub('ProductAvailability',
@@ -154,7 +154,7 @@ module Elibri
                                   ),
                  :stock_info => stub('stock_info', :exact_info? => true, :on_hand => '1000'),
                  :price_infos => [ stub('PriceInfo', :minimum_order_quantity => 20, :amount => 12.99, :vat => 7, :currency_code => 'PLN') ]
-                ),
+                ).extend(MockMethodMissing),
 
             stub('ProductAvailability',
                  :supplier_identifier => 'pl.pwn.ksiegarnia.produkt.id.76734',
@@ -166,10 +166,10 @@ module Elibri
                                    :phone => '22 631 40 83',
                                    :email => 'bok@pwn.pl',
                                    :website => 'http://pwn.pl'
-                                  ),
+                                  ).extend(MockMethodMissing),
                  :stock_info => stub('stock_info', :exact_info? => false, :quantity_code => 'mało'),
                  :price_infos => [ stub('PriceInfo', :minimum_order_quantity => 10, :amount => 14.99, :vat => 7, :currency_code => 'PLN') ]
-                )
+                ).extend(MockMethodMissing)
           ]
         }.merge(options)
         mock("product").tap do |product|
@@ -195,7 +195,7 @@ module Elibri
                  :price_infos => [ stub('PriceInfo', :minimum_order_quantity => 20, :amount => 12.99, :vat => 7, :currency_code => 'PLN') ],
                  :supplier => stub('Supplier', :name => "Olesiejuk",
                                                :nip => "527-22-62-432", :phone => "22 721 70 07", :email => "", :website => "www.olesiejuk.pl"),
-                 :supplier_role_onix_code => Elibri::ONIX::Dict::Release_3_0::SupplierRole::WHOLESALER)
+                 :supplier_role_onix_code => Elibri::ONIX::Dict::Release_3_0::SupplierRole::WHOLESALER).extend(MockMethodMissing)
           ]
         }.merge(options)
         mock("product").tap do |product|
@@ -703,7 +703,7 @@ module Elibri
     
       def contributor_mock(options = {})
         opt = {
-          :artificial_id => 257,
+          :artificial_id => 240,
           :role_onix_code => Elibri::ONIX::Dict::Release_3_0::ContributorRole::AUTHOR,
           :language_onix_code => 'pol',
           :title => 'prof.',
