@@ -776,7 +776,26 @@ module Elibri
         end.extend(MockMethodMissing)
       end
       
+      def description_mock(options = {})
+        opt = 
+        {
+          :artificial_id => 137,
+          :type_onix_code => Elibri::ONIX::Dict::Release_3_0::OtherTextType::MAIN_DESCRIPTION,
+          :text => 'Recenzja książki',
+          :text_author => 'Jan Kowalski', 
+          :updated_at => Date.new(2011, 12, 03).to_time + 19.hours + 5.minutes + 28.seconds,
+          :exportable? => true,
+          :is_a_review? => false,
+          :resource_link => 'http://example' 
+        }.merge(options)
+        mock('OtherText').tap do |descr|
+          descr.stubs(
+            opt
+          )
+        end.extend(MockMethodMissing)
       end
-
+      
+      
+    end
   end
 end

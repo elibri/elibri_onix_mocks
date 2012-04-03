@@ -17,6 +17,7 @@ methods to create mock objects:
 `onix_title_with_collection_example` `onix_texts_example` `onix_related_products_example`
 `onix_supply_details_example` `onix_series_memberships_example` `onix_supporting_resources_example`
 `onix_elibri_extensions_example` `contributor_mock` `review_mock` `supply_detail_mock` `imprint_mock`
+`description_mock`
 
 Creating xml:
 ``Elibri::ONIX::XMLGenerator.new(mock_object).to_s``
