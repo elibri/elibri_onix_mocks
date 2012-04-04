@@ -19,8 +19,14 @@ methods to create mock objects:
 `onix_elibri_extensions_example` `contributor_mock` `review_mock` `supply_detail_mock` `imprint_mock`
 `description_mock`
 
-Creating xml:
+Each method take arguments in a hash form, where key is the name of attribute in mock object. Value can be string, array, another mock object - depend on situation.
+
+For list of important attributes please look into lib/mocks/xml_mocks.rb file.
+ 
+If you want to create eLibri xml from mock:
 ``Elibri::ONIX::XMLGenerator.new(mock_object).to_s``
 
 Creating product from xml:
 ``Elibri::ONIX::Release_3_0::ONIXMessage.from_xml(xml_string)``
+
+Therefore you can use it to test your api handling function - you will receive same xml from mock, as you will receive from actual elibri api (with different data ofc :))
