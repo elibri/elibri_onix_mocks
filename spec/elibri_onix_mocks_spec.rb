@@ -1,7 +1,6 @@
 # encoding: UTF-8
 
 require 'spec_helper'
-
 $VERBOSE = nil #temp: supress id warnings
 
 describe Elibri::XmlMocks::Examples do
@@ -28,6 +27,11 @@ describe Elibri::XmlMocks::Examples do
   
   end
   
+  it "onix_subjects_example should return a valid list of product categories" do
+    product_with_categories = Elibri::XmlMocks::Examples.onix_subjects_example()
+    message = Elibri::ONIX::Release_3_0::ONIXMessage.from_xml(Elibri::ONIX::XMLGenerator.new(product_with_categories).to_s)
+    message.products.first.subjects.should_not be_empty
+  end
   #more tests to add
   
 end

@@ -351,7 +351,11 @@ module Elibri
       def onix_subjects_example(options = {})
         opt = {
           :elibri_product_category1_id => 1110,
-          :elibri_product_category2_id => 491
+          :elibri_product_category2_id => 491,
+          :elibri_product_categories => [
+             stub('ElibriProductCategoryi', :id => '1110', :full_node_path_name => 'Historia / II Wojna Światowa / Ruch oporu'),
+             stub('ElibriProductCategoryi', :id => '491', :full_node_path_name => 'Szkoła i nauczanie / Lektury szkolne z opracowaniami')
+          ]
         }.merge(options)
         basic_product.tap do |product|
           product.stubs(
