@@ -248,23 +248,6 @@ module Elibri
         end.extend(OnixHelpers::InstanceMethods).extend(MockMethodMissing)
       end
 
-
-      def onix_categories_example(options = {})
-        opt = {
-          :publisher_name => "Buchmann",
-          :publisher_id => 15,
-          :publisher_product_categories => [
-             stub('PublisherProductCategory', :name => "Beletrystyka: Horror"),
-             stub('PublisherProductCategory', :name => "Beletrystyka: Sensacja")
-          ]
-        }.merge(options)
-        basic_product.tap do |product|
-           product.stubs(
-            opt
-           )
-        end.extend(OnixHelpers::InstanceMethods).extend(MockMethodMissing)
-      end
-
       def onix_languages_example(options = {})
         opt = {
            :languages => [
@@ -348,14 +331,18 @@ module Elibri
 
 
 
-      def onix_subjects_example(options = {})
+      def onix_subjects_example(options={})
+        category1_id = options.has_key?(:elibri_product_category1_id) ? options[:elibri_product_category1_id] : 491
+        category2_id = options.has_key?(:elibri_product_category2_id) ? options[:elibri_product_category2_id] : 1110
+
+        categories = []
+        categories << stub('ElibriProductCategory', :id => category1_id, :full_node_path_name => "Kategoria #{category1_id}") if category1_id
+        categories << stub('ElibriProductCategory', :id => category2_id, :full_node_path_name => "Kategoria #{category2_id}") if category2_id
+
         opt = {
-          :elibri_product_category1_id => 1110,
-          :elibri_product_category2_id => 491,
-          :elibri_product_categories => [
-             stub('ElibriProductCategoryi', :id => '1110', :full_node_path_name => 'Historia / II Wojna Światowa / Ruch oporu'),
-             stub('ElibriProductCategoryi', :id => '491', :full_node_path_name => 'Szkoła i nauczanie / Lektury szkolne z opracowaniami')
-          ]
+          :elibri_product_category1_id => category1_id,
+          :elibri_product_category2_id => category2_id,
+          :elibri_product_categories => categories
         }.merge(options)
         basic_product.tap do |product|
           product.stubs(
