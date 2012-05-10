@@ -24,6 +24,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rake'
 
   # s.add_runtime_dependency "rest-client"
+  s.add_runtime_dependency "elibri_onix_generator"
   s.add_runtime_dependency "elibri_onix_dict"
   s.add_runtime_dependency 'elibri_api_client'
   s.add_runtime_dependency "mocha"
