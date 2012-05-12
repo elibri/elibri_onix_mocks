@@ -41,6 +41,23 @@ describe Elibri::XmlMocks::Examples do
     message.products.first.subjects.size.should == 0
 
   end
-  #more tests to add
+  
+  Elibri::ONIX::Release_3_0::Product::ATTRIBUTES.each do |property|
+    
+    next if [:current_state, :cover_type, :imprint, :publishing_status, :series_names].include? property
+
+      it "should create properly attribute #{property} inside product and should it parse properly" do
+        product = Elibri::XmlMocks::Examples.book_example(property => '1')
+        message = Elibri::ONIX::Release_3_0::ONIXMessage.from_xml(Elibri::ONIX::XMLGenerator.new(product).to_s)
+        product.send(property).should eq('1')
+      end
+      
+    end
+    
+    it "should create properly attribute current_state inside product and should it parse properly" do
+      product = Elibri::XmlMocks::Examples.book_example(:notification_type => '04')
+      message = Elibri::ONIX::Release_3_0::ONIXMessage.from_xml(Elibri::ONIX::XMLGenerator.new(product).to_s)
+      product.send(:current_state).should eq('published')
+    end
   
 end
