@@ -767,6 +767,18 @@ module Elibri
         end.extend(MockMethodMissing)
       end
       
+      def collection_mock(options = {})
+        opt =
+        {
+          :name => 'Nazwa kolekcji'
+        }.merge(options)
+        mock('PublisherCollection').tap do |coll|
+          coll.stubs(
+            opt
+          )
+        end.extend(MockMethodMissing)
+      end
+      
       def description_mock(options = {})
         opt = 
         {
