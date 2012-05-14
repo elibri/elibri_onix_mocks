@@ -779,6 +779,15 @@ module Elibri
         end.extend(MockMethodMissing)
       end
       
+      def authorship_kind_mock(options = {})
+        opt = {
+          :user_given? => true,
+          :collective? => false,
+          :no_contributor? => false
+        }.merge(options)
+        stub('AuthorshipKind', opt)
+      end
+      
       def description_mock(options = {})
         opt = 
         {

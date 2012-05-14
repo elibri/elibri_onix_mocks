@@ -45,16 +45,11 @@ describe Elibri::XmlMocks::Examples do
 
 =begin
 
-    :, :, :collection_part, :full_title, :original_title,
-    :trade_title, :parsed_publishing_date, :record_reference, :deletion_text, :cover_type,
-    :cover_price, :vat, :pkwiu, :product_composition, :product_form, :imprint, :publisher,
-    :product_form, :no_contributor, :edition_statement, :number_of_illustrations, :publishing_status,
-    :publishing_date, :premiere, :front_cover, :series_names, :elibri_product_category1_id, :elibri_product_category2_id,
-    :preview_exists, :short_description
+    :, :
 =end
 
   NAME_STRING_VECTOR = {
-#    :height => :height,
+
 #    :width => :width,
 #    :weight => :weight,
 #    :thickness => :thickness,
@@ -73,7 +68,21 @@ describe Elibri::XmlMocks::Examples do
     :subtitle => :subtitle,
     [:collection, Proc.new {  Elibri::XmlMocks::Examples.collection_mock(:name => 'nazwa') } ] => [:collection_title, 'nazwa'],
     # [ :atrybut do podania do mocka, proc ktory wygeneruje mock ] => [ :atrybut w elibri, wartosc oczekiwana ] 
-  
+    :collection_part => :collection_part,
+    :or_title => :original_title,
+    :trade_title => :trade_title,
+    [ :sale_restricted_to, Proc.new { Date.new(2011, 1, 1) } ] => [ :parsed_publishing_date, [2011, 1, 1] ],
+    :record_reference => :record_reference,
+    :deletion_text => :deletion_text,
+    :pkwiu => :pkwiu,
+#    :product_composition => :product_composition,
+#    :product_form => :product_form,
+    :edition_statement => :edition_statement,
+#    :publishing_status => :publishing_status,
+#    :front_cover => :front_cover,
+#    :series_names => :series_names,
+#    :short_description => :short_description
+
   }
   
   NAME_STRING_VECTOR.keys.each do |property|
@@ -97,9 +106,12 @@ describe Elibri::XmlMocks::Examples do
     end
     
     NAME_INT_VECTOR = {
+      :height => :height,
       :publisher_id => :publisher_id,
       :audience_age_from => :reading_age_from,
       :audience_age_to => :reading_age_to,
+      :vat => :vat,
+#      :number_of_illustrations => :number_of_illustrations,
       
     }
     
@@ -130,5 +142,62 @@ describe Elibri::XmlMocks::Examples do
       message.products.first.send(:imprint).send(:name).should eq('Imprint Mock')
       message.products.first.send(:imprint_name).should eq('Imprint Mock')
     end
-  
+    
+    it "should create full_title inside product based on other fields" do
+      collection = Elibri::XmlMocks::Examples.collection_mock(:name => 'Kolekcja książek')
+      product = Elibri::XmlMocks::Examples.book_example(
+        :title => "Numer jeden", :subtitle => 'Książka nawiedzona',
+        :edition_statement => 'wyd. 1, zepsute', :collection => collection,
+        :collection_part => 'Część 123')
+      message = Elibri::ONIX::Release_3_0::ONIXMessage.from_xml(Elibri::ONIX::XMLGenerator.new(product).to_s)
+      message.products.first.send(:full_title).should eq('Kolekcja książek (Część 123). Numer jeden. Książka nawiedzona')
+    end
+    
+    it "should create cover_price attribute inside product and should it parse properly" do
+      product = Elibri::XmlMocks::Examples.book_example(:price_amount => 9.99)
+      message = Elibri::ONIX::Release_3_0::ONIXMessage.from_xml(Elibri::ONIX::XMLGenerator.new(product).to_s)
+      message.products.first.send(:cover_price).should eq(9.99)
+    end
+    
+    it "should create publisher_name attribute inside product and should it parse properly" do
+      product = Elibri::XmlMocks::Examples.book_example(:publisher_name => 'Wydawnictwo')
+      message = Elibri::ONIX::Release_3_0::ONIXMessage.from_xml(Elibri::ONIX::XMLGenerator.new(product).to_s)
+      message.products.first.send(:publisher_name).should eq('Wydawnictwo')
+      message.products.first.send(:publisher).send(:name).should eq('Wydawnictwo')
+    end
+    
+    it "should create no_contributors attribute inside product and should it parse properly" do
+      product = Elibri::XmlMocks::Examples.book_example
+      message = Elibri::ONIX::Release_3_0::ONIXMessage.from_xml(Elibri::ONIX::XMLGenerator.new(product).to_s)
+      message.products.first.send(:no_contributor?).should eq(false)
+      authorship_kind = Elibri::XmlMocks::Examples.authorship_kind_mock(:no_contributor? => true)
+      product = Elibri::XmlMocks::Examples.book_example(:authorship_kind => authorship_kind)
+      message = Elibri::ONIX::Release_3_0::ONIXMessage.from_xml(Elibri::ONIX::XMLGenerator.new(product).to_s)
+      message.products.first.send(:no_contributor?).should eq(true)
+    end
+    
+    it "should create publishing_date and  attribute inside product and should it parse properly" do
+      product = Elibri::XmlMocks::Examples.book_example(
+        :publication_day => 1, :publication_month => 1, :publication_year => 2010, :sale_restricted_to => Date.new(2010,1,1))
+      message = Elibri::ONIX::Release_3_0::ONIXMessage.from_xml(Elibri::ONIX::XMLGenerator.new(product).to_s)
+      pub_date = message.products.first.send(:publishing_date)
+      pub_date.class.should eq(Elibri::ONIX::Release_3_0::PublishingDate)
+      pub_date.date.should eq('20100101')
+      message.products.first.send(:premiere).should eq(Date.new(2010,1,1))
+    end
+    
+    it "should create preview_exists and and should it parse properly" do
+      product = Elibri::XmlMocks::Examples.book_example(:preview_exists? => true)
+      message = Elibri::ONIX::Release_3_0::ONIXMessage.from_xml(Elibri::ONIX::XMLGenerator.new(product).to_s)
+      message.products.first.send(:preview_exists).should eq(true)
+      product = Elibri::XmlMocks::Examples.book_example(:preview_exists? => false)
+      message = Elibri::ONIX::Release_3_0::ONIXMessage.from_xml(Elibri::ONIX::XMLGenerator.new(product).to_s)
+      message.products.first.send(:preview_exists).should eq(false)
+      product = Elibri::XmlMocks::Examples.book_example
+      message = Elibri::ONIX::Release_3_0::ONIXMessage.from_xml(Elibri::ONIX::XMLGenerator.new(product).to_s)
+      message.products.first.send(:preview_exists).should eq(false)
+    end
+    
+    
+    
 end

@@ -1,5 +1,6 @@
 require 'active_support'
 require 'ostruct'
+require 'elibri_onix'
 require 'elibri_onix_dict'
 require 'elibri_api_client'
 require 'elibri_onix_generator'
