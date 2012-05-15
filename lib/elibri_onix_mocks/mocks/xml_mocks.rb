@@ -78,6 +78,7 @@ module Elibri
           :kind_of_ebook? => true,
           :kind_of_audio? => true,
           :kind_of_map? => true,
+          :kind_of_measurable? => true,
           #:map_scale => '20000',
           :elibri_product_category1_id => 1110,
           :elibri_product_category2_id => 491,

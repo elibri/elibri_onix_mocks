@@ -4,7 +4,7 @@ require 'spec_helper'
 $VERBOSE = nil #temp: supress id warnings
 
 describe Elibri::XmlMocks::Examples do
-=begin 
+
   [
   :basic_product, :book_example, :onix_record_identifiers_example, :onix_product_form_example,
   :onix_epub_details_example, :onix_languages_example,
@@ -41,29 +41,11 @@ describe Elibri::XmlMocks::Examples do
     message.products.first.subjects.size.should == 0
 
   end
-=end 
-
-=begin
-
-    :, :
-=end
 
   NAME_STRING_VECTOR = {
-
-#    :width => :width,
-#    :weight => :weight,
-#    :thickness => :thickness,
     :ean => :ean,    
     :isbn_value => :isbn13,
- #   :number_of_pages => :number_of_pages,
-#    :duration => :duration
-#    :file_size => :file_size,
     :publisher_name => :publisher_name,
-#    :table_of_contents => :table_of_contents,
-#    :description => :description
-#    :reviews => :reviews, RELATION
-#    :excerpts => :excerpts RELATION
-#    :series => :series,
     :title => :title,
     :subtitle => :subtitle,
     [:collection, Proc.new {  Elibri::XmlMocks::Examples.collection_mock(:name => 'nazwa') } ] => [:collection_title, 'nazwa'],
@@ -75,21 +57,12 @@ describe Elibri::XmlMocks::Examples do
     :record_reference => :record_reference,
     :deletion_text => :deletion_text,
     :pkwiu => :pkwiu,
-#    :product_composition => :product_composition,
-#    :product_form => :product_form,
-    :edition_statement => :edition_statement,
-#    :publishing_status => :publishing_status,
-#    :front_cover => :front_cover,
-#    :series_names => :series_names,
-#    :short_description => :short_description
-
+    :edition_statement => :edition_statement
   }
   
   NAME_STRING_VECTOR.keys.each do |property|
       
     
-#    next if [:current_state, :cover_type, :imprint, :publishing_status, :series_names].include? property
-
       it "should create properly string attribute #{property} inside product and should it parse properly" do
         if property.is_a?(Array)
           product = Elibri::XmlMocks::Examples.book_example(property[0] => property[1].call)
@@ -106,13 +79,19 @@ describe Elibri::XmlMocks::Examples do
     end
     
     NAME_INT_VECTOR = {
-      :height => :height,
       :publisher_id => :publisher_id,
       :audience_age_from => :reading_age_from,
       :audience_age_to => :reading_age_to,
       :vat => :vat,
-#      :number_of_illustrations => :number_of_illustrations,
-      
+      :number_of_illustrations => :number_of_illustrations,
+      :number_of_pages => :number_of_pages,
+      :duration => :duration,
+      :file_size => :file_size,
+      ### atrybuty powiązane z kind_of_measurable
+      #:width => :width,
+      #:weight => :weight,
+      #:thickness => :thickness,
+      #:height => :height,
     }
     
     NAME_INT_VECTOR.keys.each do |property|
@@ -131,8 +110,6 @@ describe Elibri::XmlMocks::Examples do
       message = Elibri::ONIX::Release_3_0::ONIXMessage.from_xml(Elibri::ONIX::XMLGenerator.new(product).to_s)
       message.products.first.send(:current_state).should eq(:published)
     end
-    
-    ### cover_type
     
     it "should create imprint attribute inside product and should it parse properly" do
       imprint = Elibri::XmlMocks::Examples.imprint_mock(:name => 'Imprint Mock')
@@ -186,7 +163,7 @@ describe Elibri::XmlMocks::Examples do
       message.products.first.send(:premiere).should eq(Date.new(2010,1,1))
     end
     
-    it "should create preview_exists and and should it parse properly" do
+    it "should create preview_exists and should it parse properly" do
       product = Elibri::XmlMocks::Examples.book_example(:preview_exists? => true)
       message = Elibri::ONIX::Release_3_0::ONIXMessage.from_xml(Elibri::ONIX::XMLGenerator.new(product).to_s)
       message.products.first.send(:preview_exists).should eq(true)
@@ -198,6 +175,73 @@ describe Elibri::XmlMocks::Examples do
       message.products.first.send(:preview_exists).should eq(false)
     end
     
+    it "should create product_composition and should it parse properly (but always 00 right now)" do
+      product = Elibri::XmlMocks::Examples.book_example(:product_composition => '00')
+      message = Elibri::ONIX::Release_3_0::ONIXMessage.from_xml(Elibri::ONIX::XMLGenerator.new(product).to_s)
+      message.products.first.send(:product_composition).should eq('00')
+      product = Elibri::XmlMocks::Examples.book_example(:product_composition => 'asd')
+      message = Elibri::ONIX::Release_3_0::ONIXMessage.from_xml(Elibri::ONIX::XMLGenerator.new(product).to_s)
+      message.products.first.send(:product_composition).should eq('00')
+    end
     
+    it "should create product_form and should it parse properly" do
+      product = Elibri::XmlMocks::Examples.book_example(:product_form_onix_code => 'EA')
+      message = Elibri::ONIX::Release_3_0::ONIXMessage.from_xml(Elibri::ONIX::XMLGenerator.new(product).to_s)
+      message.products.first.send(:product_form).should eq('EA')
+      product = Elibri::XmlMocks::Examples.book_example(:product_form_onix_code => 'BA')
+      message = Elibri::ONIX::Release_3_0::ONIXMessage.from_xml(Elibri::ONIX::XMLGenerator.new(product).to_s)
+      message.products.first.send(:product_form).should eq('BA')
+    end
+    
+    it "should create publishing_status and should it parse properly" do
+      product = Elibri::XmlMocks::Examples.book_example(:publishing_status_onix_code => Elibri::ONIX::Dict::Release_3_0::PublishingStatusCode::ACTIVE)
+      product.publishing_status_onix_code.should eq(Elibri::ONIX::Dict::Release_3_0::PublishingStatusCode::ACTIVE)
+      product.publishing_status_onix_code.present?.should eq(true)
+      message = Elibri::ONIX::Release_3_0::ONIXMessage.from_xml(Elibri::ONIX::XMLGenerator.new(product).to_s)
+      message.products.first.send(:publishing_status).should eq(Elibri::ONIX::Dict::Release_3_0::PublishingStatusCode::ACTIVE)
+  ### dlaczego nie zmienia sie status?
+  #    product = Elibri::XmlMocks::Examples.book_example(:publishing_status_onix_code => Elibri::ONIX::Dict::Release_3_0::PublishingStatusCode::FORTHCOMING)
+  #    product.publishing_status_onix_code.should eq(Elibri::ONIX::Dict::Release_3_0::PublishingStatusCode::FORTHCOMING)
+  #    product.publishing_status_onix_code.present?.should eq(true)
+  #    message = Elibri::ONIX::Release_3_0::ONIXMessage.from_xml(Elibri::ONIX::XMLGenerator.new(product).to_s)
+  #    message.products.first.send(:publishing_status).should eq(Elibri::ONIX::Dict::Release_3_0::PublishingStatusCode::FORTHCOMING)
+    end    
+    
+    
+    
+    it "should create series_name attribute inside product and should it parse properly" do
+      product = Elibri::XmlMocks::Examples.onix_series_memberships_example
+      message = Elibri::ONIX::Release_3_0::ONIXMessage.from_xml(Elibri::ONIX::XMLGenerator.new(product).to_s)
+      message.products.first.send(:series_names).should eq(['Lektury szkolne','Dla Bystrzaków'])
+    end
+    
+    it "should create series attribute inside product and should it parse properly" do
+      product = Elibri::XmlMocks::Examples.onix_series_memberships_example
+      message = Elibri::ONIX::Release_3_0::ONIXMessage.from_xml(Elibri::ONIX::XMLGenerator.new(product).to_s)
+      message.products.first.send(:series).should eq([['Lektury szkolne', '2'], ['Dla Bystrzaków', '1']])
+    end
+    
+    it "should create text_contents with types inside product and parse it properly" do
+      texts = [
+        Elibri::XmlMocks::Examples.description_mock(:type_onix_code => Elibri::ONIX::Dict::Release_3_0::OtherTextType::REVIEW, :text => 'review'),
+        Elibri::XmlMocks::Examples.description_mock(:type_onix_code => Elibri::ONIX::Dict::Release_3_0::OtherTextType::EXCERPT, :text => 'excerpt'),
+        Elibri::XmlMocks::Examples.description_mock(:type_onix_code => Elibri::ONIX::Dict::Release_3_0::OtherTextType::TABLE_OF_CONTENTS, :text => 'toc'),
+        Elibri::XmlMocks::Examples.description_mock(:type_onix_code => Elibri::ONIX::Dict::Release_3_0::OtherTextType::SHORT_DESCRIPTION, :text => 'short description'),
+        Elibri::XmlMocks::Examples.description_mock(:type_onix_code => Elibri::ONIX::Dict::Release_3_0::OtherTextType::MAIN_DESCRIPTION, :text => 'description')
+      ]
+      product = Elibri::XmlMocks::Examples.book_example(:other_texts => texts)
+      message = Elibri::ONIX::Release_3_0::ONIXMessage.from_xml(Elibri::ONIX::XMLGenerator.new(product).to_s)
+      message.products.first.send(:reviews).first.text.should eq('review')
+      message.products.first.send(:excerpts).first.text.should eq('excerpt')
+      message.products.first.send(:table_of_contents).text.should eq('toc')
+      message.products.first.send(:description).text.should eq('description')
+      message.products.first.send(:short_description).text.should eq('short description')
+    end
+    
+    it "should create proper front_cover inside item" do
+      product = Elibri::XmlMocks::Examples.book_example
+      message = Elibri::ONIX::Release_3_0::ONIXMessage.from_xml(Elibri::ONIX::XMLGenerator.new(product).to_s)
+      message.products.first.send(:front_cover).send(:link).should eq('http://elibri.com.pl/sciezka/do/pliku.png')
+    end
     
 end

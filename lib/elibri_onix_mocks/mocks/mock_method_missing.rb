@@ -7,8 +7,8 @@ module Elibri
     def method_missing(m, *args, &block)
       if m == :product_form_onix_code
         super
-      elsif [:kind_of_audio?, :kind_of_book?, :kind_of_map?, :kind_of_ebook?, :kind_of_measurable?].include? m
-        nil #TODO - dlaczego tak jest, jak to poprawić
+      elsif [:kind_of_measurable?].include? m
+        nil #bo jednostki są w elibri
       elsif [:publisher_id, :publisher_symbol, :record_reference, :ean, :no_isbn, 
         :ean_other_than_isbn, :product_form_onix_code, :file_size, :publication_year, 
         :publication_month, :publication_day, :number_of_pages, :number_of_illustrations, 
@@ -16,7 +16,7 @@ module Elibri
         :series_membership_kind, :set_membership_kind, :created_at, :updated_at, 
         :book_cover_type_onix_code, :edition_statement, :audience_age_from, 
         :audience_age_to, :sale_restricted_to, :sale_restricted_for, :imprint_id, 
-        :_publishing_status_onix_code, :sale_restricted, :isbn_id, :price_amount , 
+        :publishing_status_onix_code, :sale_restricted, :isbn_id, :price_amount , 
         :price_currency, :price_printed_on_product_onix_code, :pack_quantity, :state, 
         :__elibri_product_category1_identifier, :__elibri_product_category2_identifier, 
         :template_product_id, :title, :subtitle, :or_title, :cascading_title, :collection_id, 
@@ -27,7 +27,8 @@ module Elibri
         :super_siodemka_export_id, :wilga_xml_checksum, :isbn_from_import, :external_id, :stock_operator, :stock_quantity, 
         :motyl_product_id, :exported_to_motyl, :exported_to_motyl_at, :motyl_export_id, :epub_technical_protection_onix_code, 
         :product_form_detail_onix_code, :epub_sale_restricted_to, :epub_sale_not_restricted, :settlement_id,
-        :collection, :trade_title, :imprint, :publisher_name, :sale_restricted?, :skip_ProductSupply, :cover_type, :preview_exists?].include? m #nieobowiązkowe pola
+        :collection, :trade_title, :imprint, :publisher_name, :sale_restricted?, :skip_ProductSupply, :cover_type, :preview_exists?,
+        :kind_of_book?, :kind_of_audio?, :kind_of_map?, :kind_of_ebook?].include? m #nieobowiązkowe pola
         begin
           super
         rescue Mocha::ExpectationError
