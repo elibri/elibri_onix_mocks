@@ -15,8 +15,7 @@ describe Elibri::XmlMocks::Examples do
   :onix_audiobook_extent_example, :onix_no_contributors_example, :onix_collective_work_example,
   :onix_contributors_example, :onix_announced_product_example, :onix_preorder_product_example,
   :onix_published_product_example, :onix_out_of_print_product_example, :onix_titles_example,
-  :onix_title_with_collection_example, :onix_texts_example,
-  # :onix_related_products_example, #temporarly disabled
+  :onix_title_with_collection_example, :onix_texts_example, :onix_related_products_example,
   :onix_supply_details_example, :onix_series_memberships_example, :onix_supporting_resources_example,
   :onix_elibri_extensions_example, :contributor_mock, :review_mock, :supply_detail_mock, :imprint_mock,
   :description_mock, :product_attachment_mock, :paperclip_attachment_mock
@@ -247,16 +246,13 @@ describe Elibri::XmlMocks::Examples do
       message.products.first.send(:front_cover).send(:link).should eq('http://elibri.com.pl/sciezka/do/pliku.png')
     end
 
-=begin
-
     it "should create product with similars" do
       product = Elibri::XmlMocks::Examples.product_with_similars_mock
       message = Elibri::ONIX::Release_3_0::ONIXMessage.from_xml(Elibri::ONIX::XMLGenerator.new(product).to_s)
-      debugger
-      message.products.first.should eq('asdf')
-      
+      prd = message.products.first
+      prd.related_products.count.should eq(2)
+      prd.related_products[0].record_reference.should eq('fdb8fa072be774d97a95')
+      prd.related_products[1].record_reference.should eq('fdb8fa072be774d97a98')
     end
-    
-=end
     
 end

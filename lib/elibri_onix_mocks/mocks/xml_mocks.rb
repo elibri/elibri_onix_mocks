@@ -131,8 +131,8 @@ module Elibri
           :series_memberships => [
             stub('SeriesMembership', :series_name => 'Lektury szkolne', :number_within_series => '2').extend(MockMethodMissing)
           ],
-      #    :facsimiles => [stub('Product', :publisher_name => 'PWN', :publisher_id => 12, :publisher_symbol => 'Tytuł dodruku', :isbn_value => '9788324705818')],
-       #   :similar_products => [stub('Product', :publisher_name => 'WNT', :publisher_id => 13, :publisher_symbol => 'Tytuł podobnej książki', :isbn_value => '9788324799992')],
+          :facsimiles => [stub('Product', :publisher_name => 'PWN', :publisher_id => 12, :publisher_symbol => 'Tytuł dodruku', :isbn_value => '9788324705818', :record_reference => 'abcdefghijk')],
+          :similar_products => [stub('Product', :publisher_name => 'WNT', :publisher_id => 13, :publisher_symbol => 'Tytuł podobnej książki', :isbn_value => '9788324799992', :record_reference => 'kjihgfedcba')],
           :attachments => [
             stub('ProductAttachment', 
                  :id => 668,
@@ -581,8 +581,8 @@ module Elibri
 
       def onix_related_products_example(options = {})
         opt = {
-            :facsimiles => [stub('Product', :publisher_name => 'PWN', :publisher_id => 11, :publisher_symbol => 'Tytuł dodruku', :isbn_value => '9788324705818')],
-            :similar_products => [stub('Product', :publisher_name => 'WNT', :publisher_id => 12, :publisher_symbol => 'Tytuł podobnej książki', :isbn_value => '9788324799992')]        
+          :facsimiles => [stub('Product', :publisher_name => 'PWN', :publisher_id => 12, :publisher_symbol => 'Tytuł dodruku', :isbn_value => '9788324705818', :record_reference => 'abcdefghijk')],
+          :similar_products => [stub('Product', :publisher_name => 'WNT', :publisher_id => 13, :publisher_symbol => 'Tytuł podobnej książki', :isbn_value => '9788324799992', :record_reference => 'kjihgfedcba')]
         }.merge(options)
         basic_product.tap do |product|
           product.stubs(
@@ -837,9 +837,9 @@ module Elibri
       end
       
       def product_with_similars_mock(options = {})
-        product_1 = Elibri::XmlMocks::Examples.book_example(:title => 'title_1')
+        product_1 = Elibri::XmlMocks::Examples.book_example(:title => 'title_1', :record_reference => 'fdb8fa072be774d97a95')
         product_2 = Elibri::XmlMocks::Examples.book_example(:title => 'title_2', :isbn_value => '9788324799993', :record_reference => 'fdb8fa072be774d97a98')
-        Elibri::XmlMocks::Examples.book_example(:record_reference => 'fdb8fa072be774d97a99', :isbn_value => '9788324799990', :facsimiles => [product_1, product_2])
+        Elibri::XmlMocks::Examples.book_example(:record_reference => 'fdb8fa072be774d97a99', :isbn_value => '9788324799990', :facsimiles => [product_1, product_2], :similar_products => [])
       end
       
     end
