@@ -19,7 +19,7 @@ describe Elibri::XmlMocks::Examples do
   # :onix_related_products_example, #temporarly disabled
   :onix_supply_details_example, :onix_series_memberships_example, :onix_supporting_resources_example,
   :onix_elibri_extensions_example, :contributor_mock, :review_mock, :supply_detail_mock, :imprint_mock,
-  :description_mock
+  :description_mock, :product_attachment_mock, :paperclip_attachment_mock
   ].each do |symbol|
   
     it "should create #{symbol} xml and parse it properly" do

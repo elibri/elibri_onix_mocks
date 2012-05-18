@@ -808,6 +808,34 @@ module Elibri
         end.extend(MockMethodMissing)
       end
       
+      def product_attachment_mock(options = {})
+        opt = 
+        {
+           :id => 668,
+           :attachment_type_code => Elibri::ONIX::Dict::Release_3_0::ResourceContentType::FRONT_COVER,
+           :file_content_type => 'image/png',
+           :onix_resource_mode => Elibri::ONIX::Dict::Release_3_0::ResourceMode::IMAGE,
+           :file => paperclip_attachment_mock,
+           :updated_at => Date.new(2011, 12, 01).to_time + 19.hours + 5.minutes + 28.seconds
+        }.merge(options)
+        mock('ProductAttachment').tap do |att|
+          att.stubs(
+            opt
+          )
+        end.extend(MockMethodMissing)
+      end
+      
+      def paperclip_attachment_mock(options = {})
+        opt = {
+          :url => 'http://elibri.com.pl/sciezka/do/pliku.png' 
+        }.merge(options)
+        mock('Paperclip::Attachment').tap do |paperclip|
+          paperclip.stubs(
+            opt
+          )
+        end.extend(MockMethodMissing)
+      end
+      
       def product_with_similars_mock(options = {})
         product_1 = Elibri::XmlMocks::Examples.book_example(:title => 'title_1')
         product_2 = Elibri::XmlMocks::Examples.book_example(:title => 'title_2', :isbn_value => '9788324799993', :record_reference => 'fdb8fa072be774d97a98')
