@@ -29,28 +29,40 @@ module Elibri
       # Dla uproszczenia stub`ujemy większość funkcjonalności:
       extend Mocha::API
 
+      def defaults
+        {
+          :notification_type => stub('NotificationType', :onix_code => Elibri::ONIX::Dict::Release_3_0::NotificationType::CONFIRMED_ON_PUBLICATION),
+          :publishing_status_onix_code => Elibri::ONIX::Dict::Release_3_0::PublishingStatusCode::ACTIVE,
+          :public? => true,
+          :facsimiles => [],
+          :similar_products => [],
+          :state => "published",
+          :elibri_product_categories => [],
+          :product_availabilities => [],
+          :languages => [],
+          :other_texts => [],
+          :attachments => [],
+          :series_membership_kind => stub('SeriesMemebershipKind', :user_given? => false),
+          :authorship_kind => stub('AuthorshipKind', :user_given? => false, :collective? => false, :no_contributor? => true),
+        }
+      end
 
       # Najprostszy produkt, dla którego XML się waliduje przez RelaxNG
       def basic_product(options = {})
-        opt = {:title => "Nielegalni",
-        :product_form_onix_code => Elibri::ONIX::Dict::Release_3_0::ProductFormCode::BOOK,
-        :ean => nil,
-        :isbn_value => '9788324799992',
-        :record_reference => "fdb8fa072be774d97a97",
-        :facsimiles => [],
-        :similar_products => [],
-        :state => "published",
-        :public? => true}.merge(options)
-        mock("product") do |product|
-          product.stubs(
-            opt
-          )
-        end.extend(OnixHelpers::InstanceMethods).extend(MockMethodMissing)
+        attributes = {
+          :title => "Nielegalni",
+          :product_form_onix_code => Elibri::ONIX::Dict::Release_3_0::ProductFormCode::BOOK,
+          :ean => nil,
+          :isbn_value => '9788324799992',
+          :record_reference => "fdb8fa072be774d97a97",
+        }
+        attributes = defaults.merge(attributes).merge(options)
+        stub_everything("basic_product", attributes).extend(OnixHelpers::InstanceMethods)
       end
 
 
       def book_example(options = {})
-        opt = {
+        attributes = {
           :state => "published",
           :public? => true,
           :product_form_onix_code => Elibri::ONIX::Dict::Release_3_0::ProductFormCode::BOOK,
@@ -76,12 +88,14 @@ module Elibri
           :number_of_illustrations => 32,
           :kind_of_book? => true,
           :kind_of_ebook? => true,
+          :digital? => true,
           :kind_of_audio? => true,
           :kind_of_map? => true,
           :kind_of_measurable? => true,
           #:map_scale => '20000',
           :elibri_product_category1_id => 1110,
           :elibri_product_category2_id => 491,
+          :elibri_product_categories => [],
           :deletion_text => 'Rekord miał sporo błędów',
           :sale_restricted? => true,
           :sale_restricted_for => 'sklep.gildia.pl',
@@ -104,7 +118,7 @@ module Elibri
               :updated_at => Date.new(2011, 11, 04).to_time + 10.hours + 5.minutes + 27.seconds
             ).extend(MockMethodMissing)
           ],
-          :or_title => "Tytuł oryginalny",
+          :original_title => "Tytuł oryginalny",
           :trade_title => "Tytuł handlowy",
           :vat => 5,
           :pkwiu => "58.11.1",
@@ -116,7 +130,7 @@ module Elibri
           :edition_statement => 'wyd. 3, poprawione',
           :languages => [stub('Language', :language_onix_code => 'pol', :role_onix_code => Elibri::ONIX::Dict::Release_3_0::LanguageRole::LANGUAGE_OF_TEXT)],
           :other_texts => [
-            stub('OtherText',
+            stub_everything('OtherText',
                  :artificial_id => 137,
                  :type_onix_code => Elibri::ONIX::Dict::Release_3_0::OtherTextType::REVIEW,
                  :text => 'Recenzja książki',
@@ -125,7 +139,7 @@ module Elibri
                  :exportable? => true,
                  :is_a_review? => true,
                  :resource_link => 'http://example'
-                ).extend(MockMethodMissing)
+                )
           ],
           :series_membership_kind => stub('series_membership_kind', :user_given? => true),
           :series_memberships => [
@@ -174,16 +188,13 @@ module Elibri
                  :price_infos => [ stub('PriceInfo', :minimum_order_quantity => 10, :amount => 14.99, :vat => 7, :currency_code => 'PLN') ]
                 ).extend(MockMethodMissing)
           ]
-        }.merge(options)
-        mock("product").tap do |product|
-          product.stubs(
-            opt
-          )
-        end.extend(OnixHelpers::InstanceMethods).extend(MockMethodMissing)
+        }
+        attributes = defaults.merge(attributes).merge(options)
+        stub_everything("book_example", attributes).extend(OnixHelpers::InstanceMethods)
       end
 
       def onix_record_identifiers_example(options = {})
-        opt = {
+        attributes = {
           :state => "published",
           :title => "Nielegalni",
           :product_form_onix_code => Elibri::ONIX::Dict::Release_3_0::ProductFormCode::BOOK,
@@ -200,17 +211,14 @@ module Elibri
                                                :nip => "527-22-62-432", :phone => "22 721 70 07", :email => "", :website => "www.olesiejuk.pl"),
                  :supplier_role_onix_code => Elibri::ONIX::Dict::Release_3_0::SupplierRole::WHOLESALER).extend(MockMethodMissing)
           ]
-        }.merge(options)
-        mock("product").tap do |product|
-          product.stubs(
-            opt
-          )
-        end.extend(OnixHelpers::InstanceMethods).extend(MockMethodMissing)
+        }
+        attributes = defaults.merge(attributes).merge(options)
+        stub_everything("onix_record_identifiers_example", attributes).extend(OnixHelpers::InstanceMethods)
       end
 
 
       def onix_product_form_example(options = {})
-        opt = {
+        attributes = {
           :title => "Nielegalni",
           :ean => nil,
           :isbn_value => '9788324799992',
@@ -220,17 +228,14 @@ module Elibri
           :state => "published",
           :public? => true,
           :product_availabilities => []
-        }.merge(options)
-        mock("product").tap do |product|
-          product.stubs(
-            opt
-          )
-        end.extend(OnixHelpers::InstanceMethods).extend(MockMethodMissing)
+        }
+        attributes = defaults.merge(attributes).merge(options)
+        stub_everything("onix_product_form_example", attributes).extend(OnixHelpers::InstanceMethods)
       end
     
 
       def onix_epub_details_example(options = {})
-        opt = {
+        attributes = {
           :title => "Nielegalni",
           :ean => nil,
           :isbn_value => '9788324799992',
@@ -241,31 +246,25 @@ module Elibri
           :state => "published",
           :public? => true,
           :product_availabilities => []
-        }.merge(options)
-        mock("product").tap do |product|
-          product.stubs(
-            opt
-          )
-        end.extend(OnixHelpers::InstanceMethods).extend(MockMethodMissing)
+        }
+        attributes = defaults.merge(attributes).merge(options)
+        stub_everything("onix_epub_details_example", attributes).extend(OnixHelpers::InstanceMethods)
       end
 
       def onix_languages_example(options = {})
-        opt = {
+        attributes = {
            :languages => [
               stub('Language', :language_onix_code => 'pol', :role_onix_code => Elibri::ONIX::Dict::Release_3_0::LanguageRole::LANGUAGE_OF_TEXT),
               stub('Language', :language_onix_code => 'eng', :role_onix_code => Elibri::ONIX::Dict::Release_3_0::LanguageRole::LANGUAGE_OF_ABSTRACTS)
             ]
-        }.merge(options)
-        basic_product.tap do |product|
-          product.stubs(
-            opt
-          )
-        end.extend(OnixHelpers::InstanceMethods).extend(MockMethodMissing)
+        }
+        attributes = defaults.merge(attributes).merge(options)
+        stub_everything("onix_languages_example", attributes).extend(OnixHelpers::InstanceMethods)
       end
 
 
       def onix_measurement_example(options = {})
-        opt = {
+        attributes = {
           :title => "Katowice, mapa",
           :ean => nil,
           :isbn_value => '9788324799992',
@@ -278,17 +277,14 @@ module Elibri
           :map_scale => 50_000, 
           :state => "published",
           :public? => true
-        }.merge(options)
-        mock("product").tap do |product|
-          product.stubs(
-            opt
-          )
-        end.extend(OnixHelpers::InstanceMethods).extend(MockMethodMissing)
+        }
+        attributes = defaults.merge(attributes).merge(options)
+        stub_everything("onix_measurement_example", attributes).extend(OnixHelpers::InstanceMethods)
       end
 
 
       def onix_sale_restrictions_example(options = {})
-        opt = {
+        attributes = {
           :sale_restricted? => true,
           :sale_restricted_for => 'Empik',
           :sale_restricted_to =>  Date.new(2012, 7, 22),
@@ -296,38 +292,26 @@ module Elibri
           :publication_month => 7,
           :publication_day => 12
         }.merge(options)
-        basic_product.tap do |product|
-          product.stubs(
-            opt
-          )
-        end.extend(OnixHelpers::InstanceMethods).extend(MockMethodMissing)
+        basic_product(attributes)
       end
 
 
       def onix_audience_range_example(options = {})
-        opt = {
+        attributes = {
           :audience_age_from => 7,
           :audience_age_to => 10
         }.merge(options)
-        basic_product.tap do |product|
-          product.stubs(
-            opt
-          )
-        end.extend(OnixHelpers::InstanceMethods).extend(MockMethodMissing)
+        basic_product(attributes)
       end
 
 
       def onix_publisher_info_example(options = {})
-        opt = {
+        attributes = {
           :publisher_name => 'G+J Gruner+Jahr Polska',
           :publisher_id => 14,
           :imprint => stub('Imprint', :name => 'National Geographic')
         }.merge(options)
-        basic_product.tap do |product|
-          product.stubs(
-            opt
-          )
-        end.extend(OnixHelpers::InstanceMethods).extend(MockMethodMissing)
+        basic_product(attributes)
       end
 
 
@@ -340,206 +324,154 @@ module Elibri
         categories << stub('ElibriProductCategory', :id => category1_id, :full_node_path_name => "Kategoria #{category1_id}") if category1_id
         categories << stub('ElibriProductCategory', :id => category2_id, :full_node_path_name => "Kategoria #{category2_id}") if category2_id
 
-        opt = {
+        attributes = {
           :elibri_product_category1_id => category1_id,
           :elibri_product_category2_id => category2_id,
           :elibri_product_categories => categories
         }.merge(options)
-        basic_product.tap do |product|
-          product.stubs(
-            opt
-          )
-        end.extend(OnixHelpers::InstanceMethods).extend(MockMethodMissing)
+        basic_product(attributes)
       end
 
 
       def onix_edition_example(options = {})
-        opt = {
+        attributes = {
           :edition_statement => 'wyd. 3, poprawione'
         }.merge(options)
-        basic_product.tap do |product|
-          product.stubs(
-            opt
-          )
-        end.extend(OnixHelpers::InstanceMethods).extend(MockMethodMissing)
+        basic_product(attributes)
       end
 
 
       def onix_ebook_extent_example(options = {})
-        opt = {
+        attributes = {
           :example_title => 'E-book (rozmiar pliku, ilość stron i obrazków)',
           :product_form_onix_code => Elibri::ONIX::Dict::Release_3_0::ProductFormCode::EBOOK,
           :file_size => 1.22,
           :number_of_pages => 150,
           :number_of_illustrations => 12
         }.merge(options)
-        basic_product.tap do |product|
-            product.stubs(
-              opt
-            )
-          end.extend(OnixHelpers::InstanceMethods).extend(MockMethodMissing)
+        basic_product(attributes)
       end
 
       def onix_audiobook_extent_example(options = {})
-          opt = {
-            :example_title => 'Audio CD z długością ścieżki',
-            :product_form_onix_code => Elibri::ONIX::Dict::Release_3_0::ProductFormCode::AUDIO_CD,
-            :duration => 340
-          }.merge(options)
-          basic_product.tap do |product|
-            product.stubs(
-              opt
-            )
-          end.extend(OnixHelpers::InstanceMethods).extend(MockMethodMissing)
+        attributes = {
+          :example_title => 'Audio CD z długością ścieżki',
+          :product_form_onix_code => Elibri::ONIX::Dict::Release_3_0::ProductFormCode::AUDIO_CD,
+          :duration => 340
+        }.merge(options)
+        basic_product(attributes)
       end
  
       def onix_no_contributors_example(options = {})
-          opt = {
-            :example_title => 'Brak autorów',
-            :authorship_kind => ActiveSupport::StringInquirer.new("no_contributor")
-          }.merge(options)
-          basic_product.tap do |product|
-            product.stubs(
-              opt
-            )
-          end.extend(OnixHelpers::InstanceMethods).extend(MockMethodMissing)
+        attributes = {
+          :example_title => 'Brak autorów',
+          :authorship_kind => ActiveSupport::StringInquirer.new("no_contributor")
+        }.merge(options)
+        basic_product(attributes)
       end
 
       def onix_collective_work_example(options = {})
-        opt = {
+        attributes = {
           :example_title => 'Praca zbiorowa',
           :authorship_kind => ActiveSupport::StringInquirer.new("collective")
         }.merge(options)
-          basic_product.tap do |product|
-            product.stubs(
-              opt
-            )
-          end.extend(OnixHelpers::InstanceMethods).extend(MockMethodMissing)
+        basic_product(attributes)
       end
 
       def onix_contributors_example(options = {})
-          opt = {
-            :example_title => 'Wyszczególnieni autorzy',
-            :title => "Taka jest nasza wiara",
-            :authorship_kind => ActiveSupport::StringInquirer.new("user_given"),
-            :contributors => [
-              stub('Contributor',
-                :artificial_id => 255,
-                :role_onix_code => Elibri::ONIX::Dict::Release_3_0::ContributorRole::AUTHOR,
-                :missing_parts => true,
-                :full_name => 'Św. Tomasz z Akwinu',
-                :biography => stub('OtherText', :text => 'Tomasz z Akwinu, Akwinata, łac. Thoma de Aquino (ur. 1225, zm. 7 marca 1274) – filozof scholastyczny, teolog, członek zakonu dominikanów. Był jednym z najwybitniejszych myślicieli w dziejach chrześcijaństwa. Święty Kościoła katolickiego, jeden z doktorów Kościoła, który nauczając przekazywał owoce swej kontemplacji (łac. contemplata aliis tradere).'),
-                :updated_at => Date.new(2011, 11, 04).to_time + 10.hours + 5.minutes + 27.seconds
-              ).extend(MockMethodMissing),
-              stub('Contributor',
-                :artificial_id => 256,
-                :role_onix_code => Elibri::ONIX::Dict::Release_3_0::ContributorRole::TRANSLATOR,
-                :language_onix_code => 'lat',
-                :title => 'prof. ks.',
-                :name => 'Henryk',
-                :last_name_prefix => 'von',
-                :last_name => 'Hausswolff',
-                :last_name_postfix => 'OP',
-                :updated_at => Date.new(2011, 11, 04).to_time + 10.hours + 5.minutes + 27.seconds
-              ).extend(MockMethodMissing)
-            ]
-          }.merge(options)
-          basic_product.tap do |product|
-            product.stubs(
-              opt
-            )
-          end.extend(OnixHelpers::InstanceMethods).extend(MockMethodMissing)
+        attributes = {
+          :example_title => 'Wyszczególnieni autorzy',
+          :title => "Taka jest nasza wiara",
+          :authorship_kind => ActiveSupport::StringInquirer.new("user_given"),
+          :contributors => [
+            stub('Contributor',
+                 :artificial_id => 255,
+                 :role_onix_code => Elibri::ONIX::Dict::Release_3_0::ContributorRole::AUTHOR,
+                 :missing_parts => true,
+                 :full_name => 'Św. Tomasz z Akwinu',
+                 :biography => stub('OtherText', :text => 'Tomasz z Akwinu, Akwinata, łac. Thoma de Aquino (ur. 1225, zm. 7 marca 1274) – filozof scholastyczny, teolog, członek zakonu dominikanów. Był jednym z najwybitniejszych myślicieli w dziejach chrześcijaństwa. Święty Kościoła katolickiego, jeden z doktorów Kościoła, który nauczając przekazywał owoce swej kontemplacji (łac. contemplata aliis tradere).'),
+                 :updated_at => Date.new(2011, 11, 04).to_time + 10.hours + 5.minutes + 27.seconds
+                ).extend(MockMethodMissing),
+                  stub('Contributor',
+                       :artificial_id => 256,
+                       :role_onix_code => Elibri::ONIX::Dict::Release_3_0::ContributorRole::TRANSLATOR,
+                       :language_onix_code => 'lat',
+                       :title => 'prof. ks.',
+                       :name => 'Henryk',
+                       :last_name_prefix => 'von',
+                       :last_name => 'Hausswolff',
+                       :last_name_postfix => 'OP',
+                       :updated_at => Date.new(2011, 11, 04).to_time + 10.hours + 5.minutes + 27.seconds
+                      ).extend(MockMethodMissing)
+        ]
+        }.merge(options)
+        basic_product(attributes)
       end
 
       def onix_announced_product_example(options = {})
-        opt = {
+        attributes = {
           :state => :announced,
           :publisher_symbol => "Światu nie mamy czego zazdrościć.",
-          :or_title => "Nothing to Envy: Ordinary Lives in North Korea",
+          :original_title => "Nothing to Envy: Ordinary Lives in North Korea",
           :collection_part => '33',
           :title => 'Światu nie mamy czego zazdrościć.',
           :subtitle => "Zwyczajne losy mieszkańców Korei Północnej.",
           :publication_year => 2011
         }.merge(options)
-        basic_product.tap do |product|
-          product.stubs(
-            opt
-          )
-        end.extend(OnixHelpers::InstanceMethods).extend(MockMethodMissing)
+        basic_product(attributes)
       end
 
       def onix_preorder_product_example(options = {})
-        opt = {
+        attributes = {
           :state => :preorder,
           :publication_year => 2011,
           :publication_month => 2,
           :publication_day => 10
         }.merge(options)
-        basic_product.tap do |product|
-          product.stubs(
-            opt
-          )
-        end.extend(OnixHelpers::InstanceMethods).extend(MockMethodMissing)
+        basic_product(attributes)
       end
 
       def onix_published_product_example(options = {})
-        opt = {
+        attributes = {
           :state => :published,
           :publication_year => 2011,
           :publication_month => 2
         }.merge(options)
-        basic_product.tap do |product|
-          product.stubs(
-            opt
-          )
-        end.extend(OnixHelpers::InstanceMethods).extend(MockMethodMissing)
+        basic_product(attributes)
       end
 
       def onix_out_of_print_product_example(options = {})
-        opt = {
+        attributes = {
           :state => :out_of_print
         }.merge(options)
-        basic_product.tap do |product|
-          product.stubs(
-            opt
-          )
-        end.extend(OnixHelpers::InstanceMethods).extend(MockMethodMissing)
+        basic_product(attributes)
       end
 
       def onix_titles_example(options = {})
-        opt = {
+        attributes = {
           :publisher_symbol => "Światu nie mamy czego zazdrościć.",
-          :or_title => "Nothing to Envy: Ordinary Lives in North Korea",
+          :original_title => "Nothing to Envy: Ordinary Lives in North Korea",
           :collection_part => '33',
           :title => 'Światu nie mamy czego zazdrościć.',
           :subtitle => "Zwyczajne losy mieszkańców Korei Północnej."
         }.merge(options)
-        basic_product.tap do |product|
-          product.stubs(
-            opt
-          )
-        end.extend(OnixHelpers::InstanceMethods).extend(MockMethodMissing)
+        basic_product(attributes)
       end
 
       def onix_title_with_collection_example(options = {})
-        opt = {
+        attributes = {
           :publisher_symbol => "Thorgal 33 Statek-Miecz TWARDA",
-          :or_title => "Thorgal: Le Bateau-Sabre",
+          :original_title => "Thorgal: Le Bateau-Sabre",
           :collection_part => '33',
           :title => 'Statek-Miecz',
           :collection => stub('PublisherCollection', :name => 'Thorgal')
         }.merge(options)
-        basic_product.tap do |product|
-          product.stubs(
-            opt
-          )
-        end.extend(OnixHelpers::InstanceMethods).extend(MockMethodMissing)
+        basic_product(attributes)
       end
 
 
 
       def onix_texts_example(options = {})
-        opt = {
+        attributes = {
             :other_texts => [
               stub('OtherText',
                    :artificial_id => 133,
@@ -571,29 +503,21 @@ module Elibri
                   ).extend(MockMethodMissing),
             ]
         }.merge(options)
-        basic_product.tap do |product|
-          product.stubs(
-            opt
-          )
-        end.extend(OnixHelpers::InstanceMethods).extend(MockMethodMissing)
+        basic_product(attributes)
       end
 
 
       def onix_related_products_example(options = {})
-        opt = {
+        attributes = {
           :facsimiles => [stub('Product', :publisher_name => 'PWN', :publisher_id => 12, :publisher_symbol => 'Tytuł dodruku', :isbn_value => '9788324705818', :record_reference => 'abcdefghijk')],
           :similar_products => [stub('Product', :publisher_name => 'WNT', :publisher_id => 13, :publisher_symbol => 'Tytuł podobnej książki', :isbn_value => '9788324799992', :record_reference => 'kjihgfedcba')]
         }.merge(options)
-        basic_product.tap do |product|
-          product.stubs(
-            opt
-          )
-        end.extend(OnixHelpers::InstanceMethods).extend(MockMethodMissing)
+        basic_product(attributes)
       end
 
 
       def onix_supply_details_example(options = {})
-        opt = {
+        attributes = {
            :product_availabilities => [
               stub('ProductAvailability',
                    :supplier_identifier => 'GILD-123',
@@ -626,32 +550,24 @@ module Elibri
                   )
             ]
         }.merge(options)
-        basic_product.tap do |product|
-          product.stubs(
-            opt
-          )
-        end.extend(OnixHelpers::InstanceMethods).extend(MockMethodMissing)
+        basic_product(attributes)
       end
 
 
       def onix_series_memberships_example(options = {})
-        opt = {
+        attributes = {
           :series_membership_kind => stub('series_membership_kind', :user_given? => true),
           :series_memberships => [
             stub('SeriesMembership', :series_name => 'Lektury szkolne', :number_within_series => '2'),
             stub('SeriesMembership', :series_name => 'Dla Bystrzaków', :number_within_series => '1')
           ]
         }.merge(options)
-        basic_product.tap do |product|
-          product.stubs(
-            opt
-          )
-        end.extend(OnixHelpers::InstanceMethods).extend(MockMethodMissing)
+        basic_product(attributes)
       end
 
 
       def onix_supporting_resources_example(options = {})
-        opt = {    
+        attributes = {    
           :attachments => [
             stub('ProductAttachment', 
                  :id => 667,
@@ -671,32 +587,24 @@ module Elibri
                 )
           ]
         }.merge(options)
-        basic_product.tap do |product|
-          product.stubs(
-            opt
-          )
-        end.extend(OnixHelpers::InstanceMethods).extend(MockMethodMissing)
+        basic_product(attributes)
       end
 
 
       def onix_elibri_extensions_example(options = {})
-        opt = {
+        attributes = {
           :cover_type_id => Elibri::XmlMocks::PAPERBACK,
           :vat => 5,
           :pkwiu => "58.11.1",
           :price_amount => 12.99,
           :preview_exists? => true
         }.merge(options)
-        basic_product.tap do |product|
-          product.stubs(
-            opt
-          )
-        end.extend(OnixHelpers::InstanceMethods).extend(MockMethodMissing)
+        basic_product(attributes)
       end
     
     
       def contributor_mock(options = {})
-        opt = {
+        attributes = {
           :artificial_id => 240,
           :role_onix_code => Elibri::ONIX::Dict::Release_3_0::ContributorRole::AUTHOR,
           :language_onix_code => 'pol',
@@ -708,15 +616,11 @@ module Elibri
           :biography => stub('OtherText', :text => 'Biografia Sienkiewicza', :exportable? => true, :is_a_review? => false, :resource_link => 'http://example').extend(MockMethodMissing),
           :updated_at => Date.new(2011, 11, 04).to_time + 10.hours + 5.minutes + 27.seconds
         }.merge(options)
-        mock('Contributor').tap do |contributor|
-          contributor.stubs(
-            opt
-          )
-        end.extend(OnixHelpers::InstanceMethods).extend(MockMethodMissing)
+        stub_everything('Contributor', attributes)
       end
     
       def review_mock(options = {})
-        opt = {
+        attributes = {
           :artificial_id => 137,
           :type_onix_code => Elibri::ONIX::Dict::Release_3_0::OtherTextType::REVIEW,
           :text => 'Recenzja książki',
@@ -726,71 +630,55 @@ module Elibri
           :is_a_review? => true,
           :resource_link => 'http://example'
         }.merge(options)
-        mock('OtherText').tap do |other_text|
-          other_text.stubs(
-            opt
-          )
-        end.extend(MockMethodMissing)
+        stub_everything('OtherText', attributes)
       end
     
       def supply_detail_mock(options = {})
-        opt = 
-        {
-         :supplier_identifier => 'GILD-123',
-         :supplier_role_onix_code => Elibri::ONIX::Dict::Release_3_0::SupplierRole::PUB_NON_EXL_DIST,
-         :product_availability_onix_code => Elibri::ONIX::Dict::Release_3_0::ProductAvailabilityType::IN_STOCK,
-         :supplier => stub('Supplier',
-                           :name => 'Gildia.pl',
-                           :nip => '521-33-59-408',
-                           :phone => '22 631 40 83',
-                           :email => 'bok@gildia.pl',
-                           :website => 'http://gildia.pl'
-                          ),
-         :stock_info => stub('stock_info', :exact_info? => true, :on_hand => '1000'),
-         :price_infos => [ stub('PriceInfo', :minimum_order_quantity => 20, :amount => 12.99, :vat => 7, :currency_code => 'PLN') ]
+        attributes = {
+          :supplier_identifier => 'GILD-123',
+          :supplier_role_onix_code => Elibri::ONIX::Dict::Release_3_0::SupplierRole::PUB_NON_EXL_DIST,
+          :product_availability_onix_code => Elibri::ONIX::Dict::Release_3_0::ProductAvailabilityType::IN_STOCK,
+          :supplier => stub('Supplier',
+                            :name => 'Gildia.pl',
+                            :nip => '521-33-59-408',
+                            :phone => '22 631 40 83',
+                            :email => 'bok@gildia.pl',
+                            :website => 'http://gildia.pl'
+                           ),
+                             :stock_info => stub('stock_info', :exact_info? => true, :on_hand => '1000'),
+                             :price_infos => [ stub('PriceInfo', :minimum_order_quantity => 20, :amount => 12.99, :vat => 7, :currency_code => 'PLN') ]
         }.merge(options)
-         mock('ProductAvailability').tap do |aval|
-           aval.stubs(
-            opt
-            )
-        end.extend(MockMethodMissing)
+        stub_everything('ProductAvailability', attributes)
       end
     
       def imprint_mock(options = {})
-        opt =
+        attributes =
         {
           :name => 'National Geographic'
         }.merge(options)
-        mock('Imprint').tap do |impr|
-          impr.stubs(
-            opt
-          )
-        end.extend(MockMethodMissing)
+
+        stub_everything('Imprint', attributes)
       end
       
       def collection_mock(options = {})
-        opt =
+        attributes =
         {
           :name => 'Nazwa kolekcji'
         }.merge(options)
-        mock('PublisherCollection').tap do |coll|
-          coll.stubs(
-            opt
-          )
-        end.extend(MockMethodMissing)
+        stub_everything('PublisherCollection', attributes)
       end
       
       def authorship_kind_mock(options = {})
-        opt = {
+        attributes = {
           :user_given? => true,
           :collective? => false,
           :no_contributor? => false
         }.merge(options)
-        stub('AuthorshipKind', opt)
+        stub('AuthorshipKind', attributes)
       end
       
       def description_mock(options = {})
-        opt = 
+        attributes = 
         {
           :artificial_id => 137,
           :type_onix_code => Elibri::ONIX::Dict::Release_3_0::OtherTextType::MAIN_DESCRIPTION,
@@ -801,16 +689,11 @@ module Elibri
           :is_a_review? => false,
           :resource_link => 'http://example' 
         }.merge(options)
-        mock('OtherText').tap do |descr|
-          descr.stubs(
-            opt
-          )
-        end.extend(MockMethodMissing)
+        stub_everything('OtherText', attributes)
       end
       
       def product_attachment_mock(options = {})
-        opt = 
-        {
+        attributes = {
            :id => 668,
            :attachment_type_code => Elibri::ONIX::Dict::Release_3_0::ResourceContentType::FRONT_COVER,
            :file_content_type => 'image/png',
@@ -818,22 +701,14 @@ module Elibri
            :file => paperclip_attachment_mock,
            :updated_at => Date.new(2011, 12, 01).to_time + 19.hours + 5.minutes + 28.seconds
         }.merge(options)
-        mock('ProductAttachment').tap do |att|
-          att.stubs(
-            opt
-          )
-        end.extend(MockMethodMissing)
+        stub_everything('ProductAttachment', attributes)
       end
       
       def paperclip_attachment_mock(options = {})
-        opt = {
+        attributes = {
           :url => 'http://elibri.com.pl/sciezka/do/pliku.png' 
         }.merge(options)
-        mock('Paperclip::Attachment').tap do |paperclip|
-          paperclip.stubs(
-            opt
-          )
-        end.extend(MockMethodMissing)
+        stub_everything('Paperclip::Attachment', attributes)
       end
       
       def product_with_similars_mock(options = {})

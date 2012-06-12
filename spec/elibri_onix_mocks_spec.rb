@@ -22,9 +22,10 @@ describe Elibri::XmlMocks::Examples do
   ].each do |symbol|
   
     it "should create #{symbol} xml and parse it properly" do
-      Elibri::XmlMocks::Examples.send(symbol, {}).should_not be_nil
-      Elibri::ONIX::XMLGenerator.new(Elibri::XmlMocks::Examples.send(symbol, {})).should_not be_nil
-      Elibri::ONIX::Release_3_0::ONIXMessage.from_xml(Elibri::ONIX::XMLGenerator.new(Elibri::XmlMocks::Examples.send(symbol, {})).to_s)
+      product_example = Elibri::XmlMocks::Examples.send(symbol, {}) 
+      product_example.should_not be_nil
+      Elibri::ONIX::XMLGenerator.new(product_example).should_not be_nil
+      Elibri::ONIX::Release_3_0::ONIXMessage.from_xml(Elibri::ONIX::XMLGenerator.new(product_example).to_s)
     end
   
   end
@@ -41,7 +42,6 @@ describe Elibri::XmlMocks::Examples do
     product_with_categories = Elibri::XmlMocks::Examples.onix_subjects_example(:elibri_product_category1_id => nil, :elibri_product_category2_id => nil)
     message = Elibri::ONIX::Release_3_0::ONIXMessage.from_xml(Elibri::ONIX::XMLGenerator.new(product_with_categories).to_s)
     message.products.first.subjects.size.should == 0
-
   end
 
   NAME_STRING_VECTOR = {
@@ -53,7 +53,7 @@ describe Elibri::XmlMocks::Examples do
     [:collection, Proc.new {  Elibri::XmlMocks::Examples.collection_mock(:name => 'nazwa') } ] => [:collection_title, 'nazwa'],
     # [ :atrybut do podania do mocka, proc ktory wygeneruje mock ] => [ :atrybut w elibri, wartosc oczekiwana ] 
     :collection_part => :collection_part,
-    :or_title => :original_title,
+    :original_title => :original_title,
     :trade_title => :trade_title,
     [ :sale_restricted_to, Proc.new { Date.new(2011, 1, 1) } ] => [ :parsed_publishing_date, [2011, 1, 1] ],
     :record_reference => :record_reference,
@@ -90,10 +90,10 @@ describe Elibri::XmlMocks::Examples do
       :duration => :duration,
       :file_size => :file_size,
       ### atrybuty powiązane z kind_of_measurable
-      #:width => :width,
-      #:weight => :weight,
-      #:thickness => :thickness,
-      #:height => :height,
+      :width => :width,
+      :weight => :weight,
+      :thickness => :thickness,
+      :height => :height,
     }
     
     NAME_INT_VECTOR.keys.each do |property|

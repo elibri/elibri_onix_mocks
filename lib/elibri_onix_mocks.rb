@@ -7,6 +7,7 @@ require 'elibri_onix_generator'
 require 'elibri_onix_mocks/onix_helpers'
 require "elibri_onix_mocks/version"
 require 'elibri_onix_mocks/mocks/mock_method_missing'
+require 'elibri_onix_mocks/mocks/product'
 require 'elibri_onix_mocks/mocks/xml_mocks'
 require 'elibri_onix_mocks/generators/xml_generator'
 require 'elibri_onix_mocks/xml_variant'
