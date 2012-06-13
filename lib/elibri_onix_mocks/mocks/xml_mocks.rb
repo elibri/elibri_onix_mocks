@@ -42,8 +42,9 @@ module Elibri
           :languages => [],
           :other_texts => [],
           :attachments => [],
+          :contributors => [],
           :series_membership_kind => stub('SeriesMemebershipKind', :user_given? => false),
-          :authorship_kind => stub('AuthorshipKind', :user_given? => false, :collective? => false, :no_contributor? => true),
+          :authorship_kind => stub('AuthorshipKind', :user_given? => true, :collective? => false, :no_contributor? => false),
         }
       end
 
