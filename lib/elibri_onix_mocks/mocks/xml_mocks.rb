@@ -56,6 +56,7 @@ module Elibri
           :ean => nil,
           :isbn_value => '9788324799992',
           :record_reference => "fdb8fa072be774d97a97",
+          :publisher => stub("Pulisher", :id => 10, :name => "Wydawnictwo Nowe", :city => "Warszawa")
         }
         attributes = defaults.merge(attributes).merge(options)
         stub_everything("basic_product", attributes).extend(OnixHelpers::InstanceMethods)
@@ -204,6 +205,7 @@ module Elibri
           :ean => '9788324788882',
           :isbn_value => '9788324799992',
           :public? => true,
+          :publisher => stub("Publisher", :id => 10, :name => "Wydawnictwo Nowe", :city => "Warszawa"),
           :product_availabilities => [
             stub('ProductAvailability', :supplier_identifier => '355006',
                  :product_availability_onix_code => Elibri::ONIX::Dict::Release_3_0::ProductAvailabilityType::IN_STOCK,
@@ -229,7 +231,8 @@ module Elibri
           :cover_type_id => Elibri::XmlMocks::PAPERBACK,
           :state => "published",
           :public? => true,
-          :product_availabilities => []
+          :product_availabilities => [],
+          :publisher => stub("Publisher", :id => 10, :name => "Wydawnictwo Nowe", :city => "Warszawa")
         }
         attributes = defaults.merge(attributes).merge(options)
         stub_everything("onix_product_form_example", attributes).extend(OnixHelpers::InstanceMethods)
@@ -247,7 +250,8 @@ module Elibri
           :product_form_detail_onix_code => Elibri::ONIX::Dict::Release_3_0::ProductFormDetail::EPUB,
           :state => "published",
           :public? => true,
-          :product_availabilities => []
+          :product_availabilities => [],
+          :publisher => stub("Publisher", :id => 10, :name => "Wydawnictwo Nowe", :city => "Warszawa")
         }
         attributes = defaults.merge(attributes).merge(options)
         stub_everything("onix_epub_details_example", attributes).extend(OnixHelpers::InstanceMethods)
@@ -255,6 +259,9 @@ module Elibri
 
       def onix_languages_example(options = {})
         attributes = {
+           :publisher => stub("Publisher", :id => 10, :name => "Wydawnictwo Nowe", :city => "Warszawa"),
+           :product_form_onix_code => Elibri::ONIX::Dict::Release_3_0::ProductFormCode::BOOK,
+           :record_reference => "fdb8fa072be774d97a97",
            :languages => [
               stub('Language', :language_onix_code => 'pol', :role_onix_code => Elibri::ONIX::Dict::Release_3_0::LanguageRole::LANGUAGE_OF_TEXT),
               stub('Language', :language_onix_code => 'eng', :role_onix_code => Elibri::ONIX::Dict::Release_3_0::LanguageRole::LANGUAGE_OF_ABSTRACTS)
@@ -278,7 +285,8 @@ module Elibri
           :weight => 90,
           :map_scale => 50_000, 
           :state => "published",
-          :public? => true
+          :public? => true,
+          :publisher => stub("Publisher", :id => 10, :name => "Wydawnictwo Nowe", :city => "Warszawa")
         }
         attributes = defaults.merge(attributes).merge(options)
         stub_everything("onix_measurement_example", attributes).extend(OnixHelpers::InstanceMethods)
