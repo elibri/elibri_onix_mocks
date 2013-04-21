@@ -77,6 +77,7 @@ module Elibri
           :imprint => stub('Imprint', :name => 'National Geographic'),
           :publisher_name => 'GREG',
           :publisher_id => 11,
+          :publisher => stub("Publisher", :id => 11, :name => "GREG", :city => "Warszawa"),
           :ean => '9788324788882',
           :isbn_value => '9788324799992',
           :pack_quantity => 7,
